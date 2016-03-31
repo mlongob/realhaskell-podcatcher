@@ -1,1 +1,6 @@
 *.db
+dist/
+*.mp3
+*.o
+*.hi
+pod
