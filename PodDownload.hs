@@ -9,6 +9,7 @@ import System.IO
 import Database.HDBC
 import Data.Maybe
 import Network.URI
+import System.FilePath ((</>))
 
 downloadURL :: String -> IO (Either String String)
 downloadURL url = do
@@ -40,8 +41,8 @@ updatePodcastFromFeed dbh pc = do
           where feed = parse doc (castURL pc)
                 episodes = map (item2ep pc) (items feed)
 
-getEpisode :: IConnection conn => conn -> Episode -> IO (Maybe String)
-getEpisode dbh ep = do
+getEpisode :: IConnection conn => conn -> Episode -> FilePath -> IO (Maybe String)
+getEpisode dbh ep app = do
     resp <- downloadURL $ epURL ep
     case resp of
         Left x -> do putStrLn x
@@ -53,6 +54,6 @@ getEpisode dbh ep = do
             updateEpisode dbh (ep {epDone = True})
             commit dbh
             return (Just filename)
-  where filename = "pod." ++ (show . castId . epCast $ ep) ++ "." ++
+  where filename = app </> "pod." ++ (show . castId . epCast $ ep) ++ "." ++
                         show (epId ep) ++ ".mp3"
 

@@ -1,7 +1,15 @@
 Name: pod
 Version: 1.0.0
 Build-type: Simple
-Build-Depends: HTTP, HaXml, network, network-uri, HDBC, HDBC-sqlite3, base
+Build-Depends: HDBC,
+               HDBC-sqlite3,
+               HTTP,
+               HaXml,
+               base,
+               directory,
+               filepath,
+               network,
+               network-uri
 
 Executable: pod
 Main-Is: PodMain.hs

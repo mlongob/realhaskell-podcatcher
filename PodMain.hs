@@ -6,10 +6,20 @@ import PodTypes
 import System.Environment
 import Database.HDBC
 import Network.Socket(withSocketsDo)
+import System.Directory (getAppUserDataDirectory, createDirectoryIfMissing)
+import System.FilePath ((</>))
+
+appFolder :: IO FilePath
+appFolder = do
+    app <- getAppUserDataDirectory "pod"
+    createDirectoryIfMissing False app
+    return app
 
 main = withSocketsDo $ handleSqlError $ do
     args <- getArgs
-    dbh <- connect "pod.db"
+    app <- appFolder
+    let dbFilename = app </> "pod.db"
+    dbh <- connect dbFilename
     case args of
         ["add", url] -> add dbh url
         ["update"] -> update dbh
@@ -41,7 +51,8 @@ download dbh =
             mapM_ procEpisode dleps
         procEpisode ep = do
             putStrLn $ "Downloading " ++ epURL ep
-            getEpisode dbh ep
+            app <- appFolder
+            getEpisode dbh ep app
 
 syntaxError = putStrLn
     "Usage: pod command [args]\n\
